@@ -1,7 +1,7 @@
-describe("A suite", function() {
-	it("contains spec with an expectation", function() {
+describe("test videoOverlay.js", function() {
+	it("should be load the DOMdocument", function() {
 
-		expect("empty").toBe("empty");
+		expect(video_overlay.init()).toBe(document);
 		
 	});
 });

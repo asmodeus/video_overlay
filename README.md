@@ -1,5 +1,8 @@
 # Welcome to my project called ws_video_overlay!
 
+## It apparently does not work for iPhone safari because it says it doesnt allow inline playing of videos.
+
+
 ## Directories
 
 ###src/

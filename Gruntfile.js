@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 						served: true, };
 		}
 		var files = Array.prototype.map.call(sources, function (value) { return karmaPatternize(value); });
-		files.push(karmaPatternize('spec/unit/**/*.js'));
+		files.push(karmaPatternize("spec/unit/**/*.js"));
 		return files;
 	}				
 
@@ -104,11 +104,18 @@ module.exports = function(grunt) {
 			}
 		},
 		express: {
-			server: {
+			build: {
 				options: {
-					port: 9000,
+					port: 9876,
 					bases: 'build/',
-			        server: 'build/main.js'
+			        server: 'build.js'
+				}
+			},
+			create: {
+				options: {
+					port: 6789,
+					bases: 'create/',
+			        server: 'create.js'
 				}
 			}
 		},
@@ -126,7 +133,8 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig(conf);
-	grunt.registerTask('express-alive', ['express', 'express-keepalive']);
+	grunt.registerTask('build', ['express:build', 'express-keepalive']);
+	grunt.registerTask('create', ['express:create', 'express-keepalive']);
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
