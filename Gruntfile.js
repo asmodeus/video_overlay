@@ -133,8 +133,6 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig(conf);
-	grunt.registerTask('build', ['express:build', 'express-keepalive']);
-	grunt.registerTask('create', ['express:create', 'express-keepalive']);
 	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -152,12 +150,12 @@ module.exports = function(grunt) {
 	
 
 	grunt.renameTask('closurecompiler', 'compile');
-	
 	// grunt.registerTask('e2e', []); // Runs e2e tests on deployed instance
-	grunt.registerTask('deploy', ['compile']); // Compiles the app and deploys an html file 
-	grunt.registerTask('unit', ['jshint:sources', 'karma:unit']); // Runs unit tests on local code
-	grunt.registerTask('unitreport', ['jshint:sources', 'karma:report', 'jsdoc']); // Runs unit tests and generates a coverage report, used for jenkins
-	grunt.registerTask('default', ['clean', 'jshint:sources', 'deploy']);
+	grunt.registerTask('build', ['express:build', 'express-keepalive']);
+	grunt.registerTask('create', ['express:create', 'express-keepalive']);
+	grunt.registerTask('unit', ['karma:unit']); // Runs unit tests on local code
+	grunt.registerTask('coverage', ['karma:report']); // Runs unit tests and generates a coverage report, used for jenkins
 	grunt.registerTask('server', ['express', 'express-keepalive']);
+	grunt.registerTask('default', ['jshint:sources', 'karma:unit']);
 
 };
