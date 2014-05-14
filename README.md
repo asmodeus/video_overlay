@@ -2,19 +2,18 @@
 
 ## It apparently does not work for iPhone safari because it says it doesnt allow inline playing of videos.
 
-
 ## Directories
 
-###src/
+### src/
 Sources.
 
-###spec/
+### spec/
 Test specification.
 
-###build/
+### build/
 Build dir.
 
-###externs/
+### externs/
 External sources.
 
 ## Commands
@@ -36,3 +35,17 @@ This compiles the sources with google closure compiler (if chosen) and deploys i
 
 ### grunt watch
 This will watch the source directory for changes and then run jshint and unit tests.
+
+## notes
+
+Apply css must spinn through '-webkit', '-ms' and  to increase compability
+```
+div {
+  -webkit-transform: value;
+  -moz-transform:    value;
+  -ms-transform:     value;
+  -o-transform:      value;
+  transform:         value;
+}
+```
+Implement generated stylesheet loaded on start with custom transforms appending transforms on elements are a question of changing css classes on them. 
