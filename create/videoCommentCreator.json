@@ -1,0 +1,9 @@
+{
+	"overlay_start":"Number()",
+	"overlay_end":"Number()",
+	"video_url":"String()",
+	"autoplay":"Boolean(true)",
+	"video_el":"null",
+	"overlay_el":"null",
+	"init":"console.log('test');"
+}
