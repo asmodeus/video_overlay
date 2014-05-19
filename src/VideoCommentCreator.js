@@ -14,30 +14,31 @@ Array.prototype.contains_ws_ = function() {
 };
 /*sugar*/
 
-function WS_DOM_Animatable ( tag, css, attribs ) {
-	// call super html
-	WS_DOM_Element.call(this, tag, css, attribs);
-	this.animClass = ''; 
-	this.animTrClass = ''; 
-	this.animTimer = []; //[start, end]
-	this.animClear = Boolean(true);
-	this.parentVideo;
+function WS_DOM_Element ( tag, css, attribs, name ) {
+	this.htmlElement = document.createElement(tag);
+	this.applyCss(css);
+	this.applyAttributes(attribs);
+	this.nameUnique = name;
 }
 
-function WS_DOM_Media ( tag, css, attribs ) {
-	WS_DOM_Element.call(this, tag, css, attribs);
-	this.video;
+function WS_DOM_Animatable ( tag, css, attribs, name, appearAt, animation ) {
+	// Call super
+	WS_DOM_Element.call( this, tag, css, attribs, name );
+	this.mediaElements = ;
+	this.animType = animation.type; 
+	this.animTimer = [animation.appear, animation.goAway]; //[start, end]
+	this.animClear = Boolean( true );
 }
 
-function WS_DOM_Element ( tag, css, attribs ) {
-	this.html_element = document.createElement(tag);
-	this.applyCss(css, this.html_element);
-	this.applyAttributes(attribs, this.html_element);
+function WS_DOM_Media ( tag, css, attribs, name, appendTo ) {
+	// Call super
+	WS_DOM_Element.call( this, tag, css, attribs, name );
+	this.setRatio();
+	this.appendTo = appendTo;
 }
 
 WS_DOM_Animatable.prototype.animate = function() {
-	var html = this.html_element, aCls = this.animationClass, tCls = this.transitionClass;
-	// used by  animatable
+	var html = this.htmlElement, aCls = this.animationClass, tCls = this.transitionClass;
 	this.transitionend = false;
 	if (html.className.indexOf(aCls) === -1) {	
 		html.className = ' '+aCls+' '+tCls;
@@ -48,7 +49,7 @@ WS_DOM_Animatable.prototype.animate = function() {
 
 // Creates a style sheet with a class that can then be applied to the element {anim_timer = [start,end]}
 WS_DOM_Animatable.prototype.setAnimation = function( anim_class, transform_class, timer ) { 
-	var html = this.html_element;
+	var html = this.htmlElement;
 	html.className = anim_class+' '+transform_class;
 	html.addEventListener("transitionend", function(){
 		this.transitionend = true;
@@ -59,19 +60,15 @@ WS_DOM_Animatable.prototype.setAnimation = function( anim_class, transform_class
 };
 
 WS_DOM_Animatable.prototype.checkVideoTimer = function( duration ) {
-	var duration_round = Math.round(duration);
+	var duration_round = Math.round( duration );
 	if (this.animTimer[1] > duration_round) {
 		this.animTimer[1] = duration_round; 
 	}
 };
 
-WS_DOM_Element.prototype.getElement = function() {
-	return this.html_element;
-};
-
 WS_DOM_Element.prototype.setRatio = function() {
-	var html = this.html_element;
-	if (html instanceof HTMLVideoElement) {
+	var html = this.htmlElement;
+	if ( html instanceof HTMLVideoElement ) {
 		this.ratio = [1, html.videoHeight/html.videoWidth];
 	} else {
 		this.ratio = [1, html.offsetHeight/html.offsetWidth];
@@ -79,28 +76,29 @@ WS_DOM_Element.prototype.setRatio = function() {
 };
 
 WS_DOM_Element.prototype.applyCss = function( css ) {
-	var html = this.html_element;
+	var html = this.htmlElement;
 	for ( var key in css ) {
 		html.style[key] = css[key];
 	}
 };
 
 WS_DOM_Element.prototype.removeCss = function( css ) {
-	var html = this.html_element;
+	var html = this.htmlElement;
 	for (var key in css) {
 		html.style[key] = '';
 	}
 };
 
 WS_DOM_Element.prototype.applyAttributes = function( attributes ) {
-	var html = this.html_element;
+	var html = this.htmlElement;
 	for ( var key in attributes ) {
 		html.setAttribute(key, attributes[key]);
 	}
 };
+
 // Somewhat modified function, same as from here: http://www.quirksmode.org/js/findpos.html
 WS_DOM_Element.prototype.getPosition = function( ) {
-	var html = this.html_element;
+	var html = this.htmlElement;
 	var curleft = 0, curtop = 0;
 	while (html.offsetParent !== null){
 		curleft += html.offsetLeft;
@@ -112,9 +110,9 @@ WS_DOM_Element.prototype.getPosition = function( ) {
 
 var video_overlay = {
 	extendObj : function( extension, obj ){
-	  for ( var key in extension ){
-	    obj[key] = extension[key];
-	  }
+		for ( var key in extension ){
+			obj[key] = extension[key];
+		}
 	},
 	extendClass : function( sub, base ) {
 	  	var origProto = sub.prototype;
@@ -140,7 +138,7 @@ var video_overlay = {
 		stylesheet = this.createStyle(cssString);
 		head.appendChild(stylesheet);
 	},
-	// Change naming if class already present in document
+	// Change naming if class already present in document, quickfix for now
 	resolveNaming : function ( naming_json ) {
 		var query, clsNames, idName;
 		for ( var key in naming_json ) {
@@ -191,81 +189,126 @@ var video_overlay = {
 	elements: {
 		// Empty until generated
 	},	
-	generateDomElement : function ( elemConf ) {
-		elemConf.type
-		var newElem = new WS_DOM_Element();
+	generateWsDomElement : function ( elemConf ) {
+		var element;
+		switch ( elemConf.type ) {
+			case "animatable":
+				var setAtr = {  };
+
+				if (elemConf.redirectURL) 
+					setAtr["onclick"] = "document.location = '"+elemConf.redirectURL+"'";
+
+				var setCss = {
+					"text-align" : "center",
+					width : elemConf.dimensions.x,
+					height : elemConf.dimensions.y,
+					opacity : elemConf.opacity
+				};
+
+				if (elemConf.imgURI) 
+					setCss["content"] = "url("+elemConf.imgURI+")";		
+
+				element = new WS_DOM_Animatable( elemConf.tag, setCss, setAtr, elemConf.name, elemConf.appearAt, elemConf.animation );
+				element.htmlElement.innerHTML = elemConf.message;
+
+				break; 
+
+			case "media":
+				var setAtr = {
+					src : elemConf.videoURL
+				};		
+
+				if (elemConf.autoplay) 
+					setAtr["autoplay"] = elemConf.autoplay;
+				if (elemConf.controls) 
+					setAtr["controls"] = elemConf.controls;
+
+				var setCss = {
+					width : elemConf.width
+				};	
+
+				element = new WS_DOM_Media( elemConf.tag, setCss , setAtr, elemConf.appendTo );
+
+				break;
+
+		}
+		console.log( element );
+		return element;
 	},
 	// Initializes objects, calculates dimensions
 	init: function  ( conf ) {
-		this.extendClass(WS_DOM_Animatable, WS_DOM_Element);
-		this.extendClass(WS_DOM_Media, WS_DOM_Element);
-		var names = this.naming,  anims = this.animations; 
-		var overlay = new Object(), video = new Object();
-		this.resolveNaming(names.animations);
+		var names = this.naming, elems = this.elements, anims = this.animations; 
+		// Extend some classes
+		this.extendClass( WS_DOM_Animatable, WS_DOM_Element );
+		this.extendClass( WS_DOM_Media, WS_DOM_Element );
+		
+		// Fix possible naming errors
+		this.resolveNaming( names.animations );
 		this.applyNaming();
+
 		for (var key in conf) {
-			elems[key] = generateDomElement( conf[key] );		
+			elems[key] = this.generateWsDomElement( conf[key] );		
 		}
+
+		document.body.appendChild( elems.overlay.htmlElement );
+
 	},
-	// Append objects to screen, draws the app
-	doYourThing: function  () {
+	// Append objects to screen, draws the video overlay
+	main: function  () {
 		makeCss(".ws_transition_ ", "{ -webkit-transition: -webkit-transform 1s ease-in; }");
 	}
 };
 
 window.addEventListener("load", function load(event){
     window.removeEventListener("load", load, false); //remove listener, no longer needed
-	var div1, div2;
-	div1 = document.createElement('div');
-	div2 = document.createElement('div');
-	div1.className = video_overlay.naming.animations.spin;
-	div2.id = video_overlay.naming.animations.spin;
-	document.getElementsByTagName('body')[0].appendChild(div1);	
-	div1.appendChild(div2);	
-	var width = 300;
 	// Execute app last!
-	video_overlay.init(
+	video_overlay.conf = 
 	/**
 	 * json spec.
 	 * @type {{}}
 	 */
 		{
-			overlay: /* name, must be unique */ {
+			overlay:  {
 	 			 type : String('animatable'),
-				 tag : String('div'), //default  'div'
-				 opacity: Number(0.6), //default 0.6
-				 message: String(), //specify message in overlay
+				 name : String('overlay'), /* name, must be unique */
+				 tag : String('div'), // default  'div'
+				 appearAt : String('movie'),
 				/**
 				 * Placement types: 'top', 'bottom', 'left', 'right'.
 				 * Specifying banner type defaults x and y to null
 				 */
-				 placement: {x:Number(50), y:Number(50), type:String()},
-				 dimensions: {x:Number(100), y:Number(100)},
-				 appearAt : String('video'),
-				 imgURI: String(),
-				 redirectURL: String(), //string to redirect user if he clicks the overlay 
+				 placement: {x:String('100px'), y:String('100px'), type:String()},
 				/**
 				 * Animation types: 'fade', 'spin' and 'none'.
-				 */
-				 animation: {start:Number(0), end:Number(5), type:String()}, 			 
+				 */	//Timer: appear, goAway
+				 animation: {appear:Number(0), goAway:Number(5), type:String('spin')},			 
+
+				 opacity: Number( 0.6 ), //default 0.6
+				 message: String('<p>htmlstring</p>'), //specify message in overlay
+				 dimensions: {x:String('100px'), y:String('100px')},
+				 imgURL: String(''),
+				 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
 				// makeCanvas: Boolean(false), // <Proposal> Should the overlay contain a canvas?
 				// canvasURI: String() // <Proposal> String to the script executed on the canvas, might be intresting with webgl
 			},
-			video:  /* name, must be unique */  {
-	 			 type : String('video'),
+			video:    {
+	 			 type : String('media'),
+				 name : String('movie'), /* name, must be unique */
 				 tag : String('video'),
 				// name of the css selector you want to append this video to
-				appendTo : String('body'),
+				 appendTo : String('body'),
 				/**
 				 * Specified by width, crops the video element to get the correct aspect ratio
 				 */
-				 width: Number(),		
+				 width: String('100px'),		
+				 videoURL: String("mov_bbb.mp4"),
 				 autoplay: Boolean(true),
-				 videoURI: String("mov_bbb.mp4"),
-				 controls: Boolean(false), // defaults false, problems working
+				 controls: Boolean(false) // defaults false, problems working
 			}
-		}
-	);
+		};
+video_overlay.init(video_overlay.conf);		
+
+
 },false);
 
 

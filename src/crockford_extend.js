@@ -2,7 +2,6 @@
 (function (){
 "use strict";
 
-	 /*sugar*/
 	Function.prototype.method = function (name, func) {
 	    this.prototype[name] = func;
 	    return this;
@@ -37,7 +36,6 @@
 	    });
 	    return this;
 	});
-	/*sugar*/
 
 	function Parenizor(value) {
 		this.setValue(value);
