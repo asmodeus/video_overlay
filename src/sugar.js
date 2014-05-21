@@ -11,3 +11,8 @@ Array.prototype.contains_ws_ = function() {
 	}
 	return ret;
 };
+
+
+Array.prototype.remove_ws_ = function (elem) {
+	this.splice(this.indexOf(elem), 1);
+};

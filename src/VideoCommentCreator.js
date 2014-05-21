@@ -12,29 +12,56 @@ Array.prototype.contains_ws_ = function() {
 	}
 	return ret;
 };
+
+Array.prototype.remove_ws_ = function (elem) {
+	this.splice(this.indexOf(elem), 1);
+};
 /*sugar*/
 
-function WS_DOM_Element ( tag, css, attribs, name ) {
+function WS_Subject () {
+	this.observerList = [];
+}
+
+WS_Subject.prototype.addObserver = function( observer ) {
+	this.observerList.push( observer );
+};
+
+WS_Subject.prototype.removeObserver = function( observer ) {
+	this.observerList.remove_ws_( observer );
+};
+
+WS_Subject.prototype.notify = function( context ) {
+	for (var i=0; i < this.observerList.length ; i++){
+		this.observerList[i].update( context );
+	}	
+};
+
+function WS_Observer () {
+	this.update = function ( context ) {
+		// should be created locally whenever needed
+	};
+}
+
+function WS_DOM_Element ( tag, css, attribs, name, dimensions ) {
+	// Instantiate class variables
 	this.htmlElement = document.createElement(tag);
 	this.applyCss(css);
 	this.applyAttributes(attribs);
 	this.nameUnique = name;
+	this.dimensions = dimensions;
 }
 
-function WS_DOM_Animatable ( tag, css, attribs, name, appearAt, animation ) {
-	// Call super
-	WS_DOM_Element.call( this, tag, css, attribs, name );
-	this.mediaElements = ;
+function WS_DOM_Animatable ( tag, css, attribs, name, dimensions, animation, placement ) {
+	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions ); /* Super call */
+	// Instantiate class variables
+	this.placement = placement;
 	this.animType = animation.type; 
-	this.animTimer = [animation.appear, animation.goAway]; //[start, end]
+	this.animTimer = [animation.appear, animation.disappear]; // in seconds
 	this.animClear = Boolean( true );
 }
 
-function WS_DOM_Media ( tag, css, attribs, name, appendTo ) {
-	// Call super
-	WS_DOM_Element.call( this, tag, css, attribs, name );
-	this.setRatio();
-	this.appendTo = appendTo;
+function WS_DOM_Media ( tag, css, attribs, name, dimensions ) {
+	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions); /* Super call */
 }
 
 WS_DOM_Animatable.prototype.animate = function() {
@@ -49,14 +76,33 @@ WS_DOM_Animatable.prototype.animate = function() {
 
 // Creates a style sheet with a class that can then be applied to the element {anim_timer = [start,end]}
 WS_DOM_Animatable.prototype.setAnimation = function( anim_class, transform_class, timer ) { 
+	this.animTimer = timer;
+	this.animationClass = anim_class;
+	this.transitionClass = transform_class;
+
 	var html = this.htmlElement;
 	html.className = anim_class+' '+transform_class;
 	html.addEventListener("transitionend", function(){
 		this.transitionend = true;
 	});
-	this.animTimer = timer;
-	this.animationClass = anim_class;
-	this.transitionClass = transform_class;
+};
+
+// Don't draw the element bigger than the video. If thats the case, cut down the dimensions of the element
+WS_DOM_Animatable.prototype.setMaxSpace = function( maxWidth, maxHeight ) {
+	var ms = this.getMaxSpace();
+	if (ms[0] > maxWidth) {
+		var dif = ms[0] - maxWidth;
+		this.dimensions.x = this.dimensions.x - dif;
+	}
+	if (ms[1] > maxHeight) {
+		var dif = ms[1] - maxHeight;
+		this.dimensions.y = this.dimensions.x - dif;
+	}
+};
+
+// Returns the max width and height of this animatable element, i.e. for width: the placement offset plus the width.
+WS_DOM_Animatable.prototype.getMaxSpace = function( ) {
+	return [this.placement.x + this.dimensions.x, this.placement.y + this.dimensions.y];
 };
 
 WS_DOM_Animatable.prototype.checkVideoTimer = function( duration ) {
@@ -109,6 +155,23 @@ WS_DOM_Element.prototype.getPosition = function( ) {
 };
 
 var video_overlay = {
+	// Returns the first instance of an element in the document
+	cssSelector : function (selector){
+		var ret;
+		if ( selector[0] === "#" ) {
+			ret = document.getElementById(selector);
+		} else if ( selector[0] === "." ) {
+			ret = document.getElementsByClassName(selector)[0];
+		} else {
+			ret = document.getElementsByTagName(selector)[0];			
+		}
+		// if no object is returned...
+		if (ret === undefined) {
+			throw new Error("Function 'cssSelector' couldn't find anything to return. Check your hook css selector?");
+		}
+		return ret;
+	},
+
 	extendObj : function( extension, obj ){
 		for ( var key in extension ){
 			obj[key] = extension[key];
@@ -189,54 +252,60 @@ var video_overlay = {
 	elements: {
 		// Empty until generated
 	},	
+	usedAnims : {
+		// Generated in init
+	},
 	generateWsDomElement : function ( elemConf ) {
-		var element;
+			var element, 
+			setAtr = { 
+			},
+			setCss = {
+				"text-align" : "center",
+				width : elemConf.dimensions.x+"px",
+				height : elemConf.dimensions.y+"px"
+			};
+			if (elemConf.background)
+				setCss["background"] = elemConf.background;
+			if (elemConf.opacity)
+				setCss["opacity"] = elemConf.opacity;
+			if (elemConf.redirectURL) 
+				setAtr["onclick"] = "document.location = '"+elemConf.redirectURL+"'";
+			if (elemConf.contentURL) 
+				setCss["content"] = "url("+elemConf.contentURL+")";		
+			if (elemConf.videoURL) 
+				setAtr["src"] = elemConf.videoURL;
+
 		switch ( elemConf.type ) {
-			case "animatable":
-				var setAtr = {  };
+			case "animatable":	
+				setCss["visibility"] = "hidden";
 
-				if (elemConf.redirectURL) 
-					setAtr["onclick"] = "document.location = '"+elemConf.redirectURL+"'";
+				element = new WS_DOM_Animatable(  elemConf.tag, setCss, setAtr, elemConf.nameUnique, elemConf.dimensions, elemConf.animation, elemConf.placement )				
 
-				var setCss = {
-					"text-align" : "center",
-					width : elemConf.dimensions.x,
-					height : elemConf.dimensions.y,
-					opacity : elemConf.opacity
-				};
-
-				if (elemConf.imgURI) 
-					setCss["content"] = "url("+elemConf.imgURI+")";		
-
-				element = new WS_DOM_Animatable( elemConf.tag, setCss, setAtr, elemConf.name, elemConf.appearAt, elemConf.animation );
-				element.htmlElement.innerHTML = elemConf.message;
-
+				if (elemConf.innerhtml)
+					element.innerHTML = elemConf.innerhtml;
+				this.extendObj(new WS_Observer(), element);
 				break; 
 
 			case "media":
-				var setAtr = {
-					src : elemConf.videoURL
-				};		
+				setCss["visibility"] = "hidden";
+				setCss["height"] = undefined;				
+			if (elemConf.muted)
+				setAtr["muted"] = elemConf.muted;
+			if (elemConf.autoplay) 
+				setAtr["autoplay"] = elemConf.autoplay;
+			if (elemConf.controls) 
+				setAtr["controls"] = elemConf.controls;
+				// Height resize according to video aspect ratio for media elements, when height is unset standard ratio is applied
 
-				if (elemConf.autoplay) 
-					setAtr["autoplay"] = elemConf.autoplay;
-				if (elemConf.controls) 
-					setAtr["controls"] = elemConf.controls;
+				element = new WS_DOM_Media( elemConf.tag, setCss , setAtr, elemConf.nameUnique, elemConf.dimensions );
 
-				var setCss = {
-					width : elemConf.width
-				};	
-
-				element = new WS_DOM_Media( elemConf.tag, setCss , setAtr, elemConf.appendTo );
-
+				this.extendObj(new WS_Subject(), element);
 				break;
-
 		}
-		console.log( element );
 		return element;
 	},
 	// Initializes objects, calculates dimensions
-	init: function  ( conf ) {
+	init : function  ( conf ) {
 		var names = this.naming, elems = this.elements, anims = this.animations; 
 		// Extend some classes
 		this.extendClass( WS_DOM_Animatable, WS_DOM_Element );
@@ -246,17 +315,75 @@ var video_overlay = {
 		this.resolveNaming( names.animations );
 		this.applyNaming();
 
+		// This config is a mess... here im telling to get the config of the envId value
+		var contObj = elems[conf["envId"]] = {};
+		contObj.container = new WS_DOM_Element( 'div', {}, {id : conf.envId }, conf.envId );
+		var wsElem;
 		for (var key in conf) {
-			elems[key] = this.generateWsDomElement( conf[key] );		
+			if (typeof conf[key] === 'object') {
+
+				wsElem = this.generateWsDomElement ( conf[key] );
+
+				elems[conf["envId"]][key] = wsElem;
+				contObj.container.htmlElement.appendChild(wsElem.htmlElement);
+			}
 		}
 
-		document.body.appendChild( elems.overlay.htmlElement );
+		var hookTo = this.cssSelector(conf.hook);
+		hookTo.appendChild(contObj.container.htmlElement);
+
+		// quickfix
+		for (var key in elems[conf.envId]) {
+			if (elems[conf.envId][key] instanceof WS_DOM_Media)
+				var media = elems[conf.envId][key];
+		}
+
+		// Set dimensions correctly when data for them has finished loading
+		media.htmlElement.addEventListener("loadedmetadata", function(){
+			// Don't show the video before we know the size
+			media.applyCss({visibility : "visible"});
+			media.setRatio();
+			var mediaWidth = media.htmlElement.offsetWidth;
+			var mediaHeight = media.htmlElement.offsetHeight;
+
+			for (var key in elems[conf.envId]) {
+
+				if ( elems[conf.envId][key] instanceof WS_DOM_Element ) 
+					elems[conf.envId][key].applyCss({width : mediaWidth+"px", height : mediaHeight+"px", display : "relative"});
+
+				// (if) Calculate the 
+				if ( (elems[conf.envId][key] instanceof WS_DOM_Animatable) ) {
+					var animatable = elems[conf.envId][key];
+					animatable.applyCss({visibility : "visible", position : "absolute"});
+					animatable.setMaxSpace(mediaWidth, mediaHeight);
+					// Reset the width and height of the animatable element
+					if ( animatable.placement.type === "top" ) {
+						
+					} else if ( animatable.placement.type === "bottom" ) {
+						
+					} else if ( animatable.placement.type === "right" ) {
+						
+					} else if ( animatable.placement.type === "left" ) {
+						
+					}
+
+					animatable.applyCss({ width : animatable.dimensions.x+"px", height : animatable.dimensions.y+"px", "padding-left" : animatable.placement.x+"px", "padding-top" : animatable.placement.y+"px"});
+
+					media.addObserver(animatable);
+					
+				}
+			}
+
+		});
+
+		media.htmlElement.addEventListener("loadedmetadata", function(){ 
+
+		});
 
 	},
-	// Append objects to screen, draws the video overlay
-	main: function  () {
-		makeCss(".ws_transition_ ", "{ -webkit-transition: -webkit-transform 1s ease-in; }");
-	}
+
+
+
 };
 
 window.addEventListener("load", function load(event){
@@ -268,44 +395,48 @@ window.addEventListener("load", function load(event){
 	 * @type {{}}
 	 */
 		{
-			overlay:  {
-	 			 type : String('animatable'),
-				 name : String('overlay'), /* name, must be unique */
-				 tag : String('div'), // default  'div'
-				 appearAt : String('movie'),
+			envId : String('vidEnv_id_01'),
+		 	hook : String('body'), /* Where this element will be hooked */
+			overlay1 : {
+				/* Generic Variables */
+				 type : String('animatable'),
+				 nameUnique : String('overlay'), /* name, must be unique */
+				 tag : String('div'),  /* default 'div' */
+				 dimensions: {x:Number(50), y:Number(50)}, /* in relation to parent element */
+				 opacity: Number( 0.5 ),
+				/* Generic Variables end */
+
+				 background : String(''), /* BG color */
 				/**
 				 * Placement types: 'top', 'bottom', 'left', 'right'.
 				 * Specifying banner type defaults x and y to null
 				 */
-				 placement: {x:String('100px'), y:String('100px'), type:String()},
+				 placement: {x:Number(0), y:Number(0), type:String('bottom')}, /* where on the video would you like to place the element */
 				/**
 				 * Animation types: 'fade', 'spin' and 'none'.
-				 */	//Timer: appear, goAway
-				 animation: {appear:Number(0), goAway:Number(5), type:String('spin')},			 
-
-				 opacity: Number( 0.6 ), //default 0.6
-				 message: String('<p>htmlstring</p>'), //specify message in overlay
-				 dimensions: {x:String('100px'), y:String('100px')},
-				 imgURL: String(''),
+				 */	
+				 animation: {appear:Number(0), disappear:Number(5), type:String('spin')},			 
+				 innerhtml: String('<p>htmlstring</p>'), //specify message in overlay
+				 contentURL: String('http://placehold.it/350x150'),
 				 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
 				// makeCanvas: Boolean(false), // <Proposal> Should the overlay contain a canvas?
 				// canvasURI: String() // <Proposal> String to the script executed on the canvas, might be intresting with webgl
 			},
-			video:    {
+			video : {
+				 /* Generic Variables */
 	 			 type : String('media'),
-				 name : String('movie'), /* name, must be unique */
-				 tag : String('video'),
-				// name of the css selector you want to append this video to
-				 appendTo : String('body'),
-				/**
-				 * Specified by width, crops the video element to get the correct aspect ratio
-				 */
-				 width: String('100px'),		
+				 nameUnique : String('movie'), /* name, must be unique */
+				 tag : String('video'),				 
+				 dimensions: {x:Number(200), y:Number(9999)}, /* Resizes itself for media type elements, y value can be safely ignored */
+ 				 /* Generic Variables end */
+				 // overlays : Array('overlay'),  unique name of overlays that appears on video 
 				 videoURL: String("mov_bbb.mp4"),
-				 autoplay: Boolean(true),
+				 autoplay: Boolean(false),
+				 muted: Boolean(false),
 				 controls: Boolean(false) // defaults false, problems working
 			}
-		};
+		}
+
 video_overlay.init(video_overlay.conf);		
 
 
@@ -322,7 +453,7 @@ video_overlay.init(video_overlay.conf);
 	// 		 * Specifying banner type defaults x and y to null
 	// 		 */
 	// 		placement: {x:Number(), y:Number(), type:String()},
-	// 		 imgURI: String(),
+	// 		 contentURL: String(),
 	// 		 redirectURL: String(), //string to redirect user if he clicks the overlay 
 	// 		/**
 	// 		 * Animation types: 'fade', 'spin' and 'none'.
