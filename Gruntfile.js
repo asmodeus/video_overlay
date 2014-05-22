@@ -59,7 +59,7 @@ module.exports = function(grunt) {
 				separator: '/* ! */',
 			},
 			dist: {
-				src: ['src/WS_DOM_Animatable.js', 'src/WS_DOM_Element.js', 'src/WS_DOM_Media.js', 'src/VideoCommentCreator.js'],
+				src: ['src/WS_DOM_Animatable.js', 'src/WS_DOM_Element.js', 'src/WS_DOM_Media.js', 'src/VideoCommentCreator.js', 'src/WS_Observer.js', 'src/WS_Subject.js'],
 				dest: 'build/concat.js',
 			}
 		},
@@ -145,6 +145,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('unit', ['karma:unit']); // Runs unit tests on local code
 	grunt.registerTask('coverage', ['karma:report']); // Runs unit tests and generates a coverage report, used for jenkins
 	grunt.registerTask('server', ['express', 'express-keepalive']);
-	grunt.registerTask('default', ['jshint:sources', 'karma:unit']);
+	grunt.registerTask('default', ['concat', 'build']);
 
 };

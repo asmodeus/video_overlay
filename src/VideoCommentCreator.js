@@ -1,140 +1,5 @@
 "use strict";
 
-/**
- * @class
- */
-function WS_Subject () {
-	this.observerList = [];
-}
-
-WS_Subject.prototype.addObserver = function( observer ) {
-	this.observerList.push( observer );
-};
-
-WS_Subject.prototype.removeObserver = function( observer ) {
-	this.observerList.remove_ws_( observer );
-};
-
-WS_Subject.prototype.notify = function( context ) {
-	for (var i=0; i < this.observerList.length ; i++){
-		this.observerList[i].update( context );
-	}	
-};
-
-/**
- * @class
- */
-function WS_Observer () {
-	this.update = function ( context ) {
-		// Set this when extending an object with this class
-	};
-}
-
-/**
- * @class
- */
-function WS_DOM_Element ( tag, css, attribs, name, dimensions ) {
-	// Instantiate class variables
-	this.htmlElement = document.createElement(tag);
-	this.applyCss(css);
-	this.applyAttributes(attribs);
-	this.nameUnique = name;
-	this.dimensions = dimensions;
-}
-
-/**
- * @class
- */
-function WS_DOM_Animatable ( tag, css, attribs, name, dimensions, animation, placement ) {
-	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions ); /* Super call */
-	// Instantiate class variables
-	this.placement = placement;
-	this.animType = animation.type; 
-	this.animTimer = [animation.appear, animation.disappear]; // in seconds
-	this.animClear = Boolean( true );
-	this.tempTime = 0;
-}
-
-/**
- * @class
- */
-function WS_DOM_Media ( tag, css, attribs, name, dimensions ) {
-	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions); /* Super call */
-}
-
-WS_DOM_Animatable.prototype.animate = function() {
-	this.transitionReady = false;
-	var html = this.htmlElement, aCls = this.animationClass, tCls = this.transitionClass;
-	if ( html.className.indexOf(aCls) === -1 ) {	
-		html.className = ' '+aCls+' '+tCls;
-	} else {
-		html.className = ' '+tCls;
-	}
-};
-
-// Creates a style sheet with a class that can then be applied to the element {anim_timer = [start,end]}
-WS_DOM_Animatable.prototype.setAnimation = function( animationClass, transitionClass ) { 
-	this.animationClass = animationClass;
-	this.transitionClass = transitionClass;
-	var html = this.htmlElement;
-	html.className = animationClass+' '+transitionClass;
-	this.transitionReady = true;
-};
-
-// For custom banner placement, don't draw the banner bigger than the video. If thats the case, cut down the dimensions of the element
-WS_DOM_Animatable.prototype.setMaxSpace = function( maxWidth, maxHeight ) {
-	var ms = this.getMaxSpace();
-	if (ms[0] > maxWidth) {
-		var dif = ms[0] - maxWidth;
-		this.dimensions.x = this.dimensions.x - dif;
-	}
-	if (ms[1] > maxHeight) {
-		var dif = ms[1] - maxHeight;
-		this.dimensions.y = this.dimensions.x - dif;
-	}
-};
-
-// Returns the max width and height of this animatable element, i.e. for width: the placement offset plus the width.
-WS_DOM_Animatable.prototype.getMaxSpace = function(  ) {
-	return [this.placement.x + this.dimensions.x, this.placement.y + this.dimensions.y];
-};
-
-WS_DOM_Animatable.prototype.checkVideoTimer = function( duration ) {
-	var duration_round = Math.round( duration );
-	if (this.animTimer[1] > duration_round) {
-		this.animTimer[1] = duration_round; 
-	}
-};
-
-WS_DOM_Element.prototype.setRatio = function(  ) {
-	var html = this.htmlElement;
-	if ( html instanceof HTMLVideoElement ) {
-		this.ratio = [1, html.videoHeight/html.videoWidth];
-	} else {
-		this.ratio = [1, html.offsetHeight/html.offsetWidth];
-	}
-};
-
-WS_DOM_Element.prototype.applyCss = function( css ) {
-	var html = this.htmlElement;
-	for ( var key in css ) {
-		html.style[key] = css[key];
-	}
-};
-
-WS_DOM_Element.prototype.removeCss = function( css ) {
-	var html = this.htmlElement;
-	for (var key in css) {
-		html.style[key] = '';
-	}
-};
-
-WS_DOM_Element.prototype.applyAttributes = function( attributes ) {
-	var html = this.htmlElement;
-	for ( var key in attributes ) {
-		html.setAttribute(key, attributes[key]);
-	}
-};
 
 var video_overlay = {
 	// Returns the first instance of an element in the document using standard css selectors
@@ -412,7 +277,10 @@ var video_overlay = {
 			media.notify(curTime);
 		});
 
-	}
+		this.hasrun = true;
+
+	},
+	hasrun : Boolean(false)
 };
 
 
@@ -433,7 +301,7 @@ window.addEventListener("load", function load(event){
 				 type : String('animatable'),
 				 nameUnique : String('overlay'), /* name, must be unique */
 				 tag : String('div'),  /* default 'div' */
-				 dimensions: {x:Number(0), y:Number(0)}, /* specify minimum width and height of banner */
+				 dimensions: {x:Number(50), y:Number(50)}, /* specify minimum width and height of banner */
 				 opacity: Number( 1 ),
 				/* Generic Variables end */
 
@@ -443,7 +311,57 @@ window.addEventListener("load", function load(event){
 				 * Specifying banner type and x or y dimension overrides x and y placement,
 				 * the x and y *dimension* can still be modified though depending on where the banner will appear.
 				 */
-				 placement: {x:Number(100), y:Number(100), type:String('bottom')}, /* where on the video would you like to place the element */
+				 placement: {x:Number(0), y:Number(0), type:String('')}, /* where on the video would you like to place the element */
+				/**
+				 * Animation types: 'fade', 'spin' and 'none'.
+				 */	
+				 animation: {appear:Number(0), disappear:Number(5), type:String('spin')},			 
+				 innerhtml: String('<p>htmlstring</p>'), //specify message in overlay
+				 contentURL: String('http://placehold.it/350x150'),
+				 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
+				// makeCanvas: Boolean(false), // <Proposal> Should the overlay contain a canvas?
+				// canvasURI: String() // <Proposal> String to the script executed on the canvas, might be intresting with webgl
+			}, overlay2 : {
+				/* Generic Variables */
+				 type : String('animatable'),
+				 nameUnique : String('overlay'), /* name, must be unique */
+				 tag : String('div'),  /* default 'div' */
+				 dimensions: {x:Number(50), y:Number(50)}, /* specify minimum width and height of banner */
+				 opacity: Number( 1 ),
+				/* Generic Variables end */
+
+				 background : String(''), /* BG color */
+				/**
+				 * Placement types: 'top', 'bottom', 'left', 'right'.
+				 * Specifying banner type and x or y dimension overrides x and y placement,
+				 * the x and y *dimension* can still be modified though depending on where the banner will appear.
+				 */
+				 placement: {x:Number(50), y:Number(50), type:String('')}, /* where on the video would you like to place the element */
+				/**
+				 * Animation types: 'fade', 'spin' and 'none'.
+				 */	
+				 animation: {appear:Number(0), disappear:Number(5), type:String('spin')},			 
+				 innerhtml: String('<p>htmlstring</p>'), //specify message in overlay
+				 contentURL: String('http://placehold.it/350x150'),
+				 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
+				// makeCanvas: Boolean(false), // <Proposal> Should the overlay contain a canvas?
+				// canvasURI: String() // <Proposal> String to the script executed on the canvas, might be intresting with webgl
+			} ,overlay3 : {
+				/* Generic Variables */
+				 type : String('animatable'),
+				 nameUnique : String('overlay'), /* name, must be unique */
+				 tag : String('div'),  /* default 'div' */
+				 dimensions: {x:Number(50), y:Number(50)}, /* specify minimum width and height of banner */
+				 opacity: Number( 1 ),
+				/* Generic Variables end */
+
+				 background : String(''), /* BG color */
+				/**
+				 * Placement types: 'top', 'bottom', 'left', 'right'.
+				 * Specifying banner type and x or y dimension overrides x and y placement,
+				 * the x and y *dimension* can still be modified though depending on where the banner will appear.
+				 */
+				 placement: {x:Number(100), y:Number(100), type:String('')}, /* where on the video would you like to place the element */
 				/**
 				 * Animation types: 'fade', 'spin' and 'none'.
 				 */	
@@ -459,7 +377,7 @@ window.addEventListener("load", function load(event){
 	 			 type : String('media'),
 				 nameUnique : String('movie'), /* name, must be unique */
 				 tag : String('video'),				 
-				 dimensions: {x:Number(277), y:Number(9999)}, /* Resizes itself for media type elements, y value can be safely ignored */
+				 dimensions: {x:Number(400), y:Number(9999)}, /* Resizes itself for media type elements, y value can be safely ignored */
  				 /* Generic Variables end */
 				 // overlays : Array('overlay'),  unique name of overlays that appears on video 
 				 videoURL: String("http://www.w3schools.com/html/mov_bbb.mp4"),

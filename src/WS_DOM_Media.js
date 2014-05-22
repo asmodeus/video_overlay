@@ -1,2 +1,8 @@
 /* Extends WS_DOM_Element */
-/* Extends WS_Subject */
+
+/**
+ * @class
+ */
+function WS_DOM_Media ( tag, css, attribs, name, dimensions ) {
+	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions); /* Super call */
+}

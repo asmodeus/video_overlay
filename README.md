@@ -15,5 +15,6 @@ div {
 
 Implement generated stylesheet loaded on start with custom transforms appending transforms on elements are a question of changing css classes on them. 
 
-HMTL Controls doesn't work...
+TODO: Controls...
+
 
