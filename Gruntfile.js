@@ -40,7 +40,6 @@ module.exports = function(grunt) {
 			reports: ["reports/**"],
 			build: ["build/js/**"]
 		},
-		
 		compile: {
 			options: {
 				compilation_level: 'ADVANCED_OPTIMIZATIONS',
@@ -55,8 +54,15 @@ module.exports = function(grunt) {
 				files: {'build/gcc_src.js' : 'src/**/*.js'}
 			} 
 		},
-		 
-		
+		concat : {
+			options: {
+				separator: '/* ! */',
+			},
+			dist: {
+				src: ['src/WS_DOM_Animatable.js', 'src/WS_DOM_Element.js', 'src/WS_DOM_Media.js', 'src/VideoCommentCreator.js'],
+				dest: 'build/concat.js',
+			}
+		},
 		jsdoc : {
 			makedoc : {
 				src: ['src/**/*.js'], 
@@ -65,16 +71,6 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		
-        
-        shell: {
-        	test: {
-        		options: {
-        			stdout: true
-        		},
-        		command: 'echo test'
-        	}		
-        },
 		// Karma is always used for unit tests
 		karma: {
 			unit: {
@@ -106,7 +102,7 @@ module.exports = function(grunt) {
 		express: {
 			build: {
 				options: {
-					port: 9876,
+					port: 6789,
 					bases: 'build/',
 			        server: 'build.js'
 				}
@@ -119,7 +115,6 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		
 		casperjs: {
 			options: {
 				async: {
@@ -133,21 +128,15 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig(conf);
-	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-karma');
-	
+	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-closurecompiler');
-	
-	
-	grunt.loadNpmTasks('grunt-jsdoc');
-	
-	
-	
+	grunt.loadNpmTasks('grunt-express');
 	grunt.loadNpmTasks('grunt-casperjs');
-	
+	grunt.loadNpmTasks('grunt-jsdoc');
+	grunt.loadNpmTasks('grunt-karma');
 
 	grunt.renameTask('closurecompiler', 'compile');
 	// grunt.registerTask('e2e', []); // Runs e2e tests on deployed instance
