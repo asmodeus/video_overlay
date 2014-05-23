@@ -15,6 +15,8 @@ div {
 
 Implement generated stylesheet loaded on start with custom transforms appending transforms on elements are a question of changing css classes on them. 
 
-TODO: Controls...
+TODO: 
+Controls...
+Placing objects uses padding and not anything else
 
 

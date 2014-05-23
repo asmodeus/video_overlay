@@ -1,8 +1,20 @@
-/* Extends WS_DOM_Element */
+/**
+ * Class for handling html video elements.
+ * @param {string} tag 
+ * @param {Object.<string, string>} css
+ * @param {Object.<string, string>} attribs
+ * @param {Object.<string, number>} dimensions 
+ * @extends {WS_DOM_Element}
+ * @constructor
+ */
+function WS_DOM_Media ( tag, css, attribs, dimensions ) {
+	WS_DOM_Element.call( this, tag, css, attribs, dimensions); /* Super call */
+}
 
 /**
- * @class
+ * @param {} Calculate ratio of this video element for resizeing.
  */
-function WS_DOM_Media ( tag, css, attribs, name, dimensions ) {
-	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions); /* Super call */
-}
+WS_DOM_Media.prototype.setRatio = function (  ) {
+	var html = this.htmlElement;
+	this.ratio = [1, html.videoHeight/html.videoWidth];
+};

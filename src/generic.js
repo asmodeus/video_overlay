@@ -27,27 +27,3 @@ function isEmpty (obj){
 	} else 
 		return false
 }
-
-function Subject () {
-	this.observerList = [];
-}
-
-Subject.prototype.addObserver = function( observer ) {
-	this.observerList.push( observer );
-};
-
-Subject.prototype.removeObserver = function( observer ) {
-	this.observerList.remove_ws_( observer );
-};
-
-Subject.prototype.notify = function( context ) {
-	for (var i=0; i < this.observerList.length ; i++){
-		this.observerList[i].update( context );
-	}	
-};
-
-function Observer () {
-	this.update = function () {
-		// body...
-	}
-}

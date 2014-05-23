@@ -1,8 +1,16 @@
 /**
- * @class
+ * Class for animating html elements.
+ * @param {string} tag 
+ * @param {Object.<string, string>} css
+ * @param {Object.<string, string>} attribs
+ * @param {Object.<string, number>} dimensions 
+ * @param {Object.<string, *>} animation
+ * @param {Object.<string, *>} placement
+ * @extends {WS_DOM_Element}
+ * @constructor
  */
-function WS_DOM_Animatable ( tag, css, attribs, name, dimensions, animation, placement ) {
-	WS_DOM_Element.call( this, tag, css, attribs, name, dimensions ); /* Super call */
+function WS_DOM_Animatable ( tag, css, attribs, dimensions, animation, placement ) {
+	WS_DOM_Element.call( this, tag, css, attribs, dimensions ); /* Super call */
 	// Instantiate class variables
 	this.placement = placement;
 	this.animType = animation.type; 
@@ -11,6 +19,10 @@ function WS_DOM_Animatable ( tag, css, attribs, name, dimensions, animation, pla
 	this.tempTime = 0;
 }
 
+/**
+ * Operates on an instance of MyClass and returns something.
+ * @param {project.MyClass} obj Instance of MyClass which leads to a long
+ */
 WS_DOM_Animatable.prototype.animate = function() {
 	this.transitionReady = false;
 	var html = this.htmlElement, aCls = this.animationClass, tCls = this.transitionClass;
@@ -21,7 +33,11 @@ WS_DOM_Animatable.prototype.animate = function() {
 	}
 };
 
-// Creates a style sheet with a class that can then be applied to the element {anim_timer = [start,end]}
+/**
+ * Operates on an instance of WS_DOM_Animatable and returns something.
+ * @param {string} animationClass Name of animation class
+ * @param {string} transitionClass Name of transition class
+ */
 WS_DOM_Animatable.prototype.setAnimation = function( animationClass, transitionClass ) { 
 	this.animationClass = animationClass;
 	this.transitionClass = transitionClass;
@@ -30,7 +46,11 @@ WS_DOM_Animatable.prototype.setAnimation = function( animationClass, transitionC
 	this.transitionReady = true;
 };
 
-// For custom banner placement, don't draw the banner bigger than the video. If thats the case, cut down the dimensions of the element
+/**
+ * Takes the maximum width and height of an element and changes this instances dimensions to match.
+ * @param {number} maxWidth 
+ * @param {number} maxHeight 
+ */
 WS_DOM_Animatable.prototype.setMaxSpace = function( maxWidth, maxHeight ) {
 	var ms = this.getMaxSpace();
 	if (ms[0] > maxWidth) {
@@ -43,14 +63,18 @@ WS_DOM_Animatable.prototype.setMaxSpace = function( maxWidth, maxHeight ) {
 	}
 };
 
-/*
-* @return {[]}
-*/
-// Returns the max width and height of this animatable element, i.e. for width: the placement offset plus the width.
+/**
+ * Operates on an instance of WS_DOM_Animatable and returns something.
+ * @return {Array.{number, number}} Maximum space for this element ontop the video.
+ */
 WS_DOM_Animatable.prototype.getMaxSpace = function(  ) {
 	return [this.placement.x + this.dimensions.x, this.placement.y + this.dimensions.y];
 };
 
+/**
+ * Check the video timer of the WS_DOM_Animatable object
+ * @param {number} duration Total duration of video element.
+ */
 WS_DOM_Animatable.prototype.checkVideoTimer = function( duration ) {
 	var duration_round = Math.round( duration );
 	if (this.animTimer[1] > duration_round) {

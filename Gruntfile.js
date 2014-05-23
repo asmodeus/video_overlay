@@ -56,11 +56,19 @@ module.exports = function(grunt) {
 		},
 		concat : {
 			options: {
-				separator: '/* ! */',
+				separator: '\n/* newfile! */\n',
 			},
 			dist: {
-				src: ['src/WS_DOM_Animatable.js', 'src/WS_DOM_Element.js', 'src/WS_DOM_Media.js', 'src/VideoCommentCreator.js', 'src/WS_Observer.js', 'src/WS_Subject.js'],
-				dest: 'build/concat.js',
+				src: 
+				['src/WS_DOM_Animatable.js',
+				 'src/WS_DOM_Element.js',
+				  'src/WS_DOM_Media.js',
+				   'src/VideoCommentCreator.js',
+				    'src/WS_Observer.js',
+				     'src/WS_Subject.js',
+				     'src/jsonspec.js'],
+
+				dest: 'build/concat.js'
 			}
 		},
 		jsdoc : {
