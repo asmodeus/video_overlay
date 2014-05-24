@@ -13,10 +13,11 @@ function WS_DOM_Element ( tag, css, attribs, dimensions ) {
    * @private
    */
 	this.htmlElement = document.createElement(tag);
+	this.dimensions = dimensions;
+	this.ratio = [];
+
 	this.applyCss(css);
 	this.applyAttributes(attribs);
-	this.dimensions = dimensions;
-	this.ratio;
 }
 
 /**

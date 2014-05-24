@@ -16,7 +16,6 @@ function WS_DOM_Animatable ( tag, css, attribs, dimensions, animation, placement
 	this.animType = animation.type; 
 	this.animTimer = [animation.appear, animation.disappear]; // in seconds
 	this.animClear = Boolean( true );
-	this.tempTime = 0;
 }
 
 /**
