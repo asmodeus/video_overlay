@@ -1,0 +1,40 @@
+#overlay {
+	position: absolute;
+	background-color: rgba(221, 221, 221, 0.3);
+	color: #FFF; 
+	top: 145px;
+	text-align: center;
+	height: 40px;
+	z-index: 2147483647;
+	content:url(http://placehold.it/350x150);
+    -webkit-transition: opacity 1s ease-in-out;
+/*    -moz-transition: opacity 1s ease-in-out;
+    -ms-transition: opacity 1s ease-in-out;
+    -o-transition: opacity 1s ease-in-out;
+	zoom: 0;
+	filter: alpha(opacity=0);
+	opacity: 0;*/
+}
+
+#container {
+
+}
+
+#pushIt {
+
+}
+
+.animate {
+	zoom: 0;
+	filter: alpha(opacity=0);
+	opacity: 0;
+}
+
+#v {
+	z-index: 1;
+}
+
+#cvs {	
+	height: 40px;
+}
+

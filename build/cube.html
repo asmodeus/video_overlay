@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js?ver=1.3.2"></script>
+<script type="text/javascript">
+	$(window).on('mousemove', function(event) {
+		var width = $(window).width();
+		var mouseX = event.pageX - (width * 0.5);
+		var height = $(window).height();
+		var mouseY = event.pageY - (height * 0.5);
+		var xAngle = (mouseY / height) * 90;
+		var yAngle = (mouseX / width) * 90;
+
+		$('.cube')[0].style.webkitTransform = "rotateX("+xAngle+"deg) rotateY("+yAngle+"deg)";
+	});	
+</script>
+<style type="text/css">
+	.cube {
+		top: 200px;
+		height: 240px;
+		position: relative;
+		margin: 0 auto;
+		width: 240px;
+		-webkit-transform-style: preserve-3d;
+	}
+	.face {
+		background-color: rgb(50, 50, 50);
+		-webkit-box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+		height: 240px;
+		opacity: 0.7;
+		position: absolute;
+		width: 240px;
+	}
+
+	.cube .one  {
+		background-color: rgb(242, 24, 25);
+		-webkit-transform: rotateX(90deg) translateZ(120px);
+	}
+
+	.cube .two {
+		background-color: rgb(235, 41, 158);
+		-webkit-transform: translateZ(120px);
+	}
+
+	.cube .three {
+		background-color: rgb(252, 209, 22);
+		-webkit-transform: rotateY(90deg) translateZ(120px);
+	}
+
+	.cube .four {
+		background-color: rgb(44, 45, 213);
+		-webkit-transform: rotateY(180deg) translateZ(120px);
+	}
+
+	.cube .five {
+		background-color: rgb(125, 105, 181);
+		-webkit-transform: rotateY(-90deg) translateZ(120px);
+	}
+
+	.cube .six {
+		background-color: rgb(22, 226, 38);
+		-webkit-transform: rotateX(-90deg) translateZ(120px) rotate(180deg);
+	}
+</style>
+	<title>3d-Cube</title>
+</head>
+<body>
+	<div class="cube">
+		<div class="face one"></div>
+		<div class="face two"></div>
+		<div class="face three"></div>
+		<div class="face four"></div>
+		<div class="face five"></div>
+		<div class="face six"></div>
+	</div>
+</body>
+</html>

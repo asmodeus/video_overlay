@@ -1,0 +1,67 @@
+<html>
+<head>
+	<title>HTML5 Video Test</title>
+	<script type="text/javascript">
+	document.onreadystatechange = function() {
+		if (document.readyState === "complete") {
+			var overlay = document.getElementById("overlay");
+			var canvas = document.getElementById("cvs");
+			overlay.onclick = function (){
+				document.location = "https://www.google.se/";
+			}
+			var v = document.getElementById("v");
+			// v.muted = true;				
+			if (v.width) {
+				console.log(v.width);
+			}
+			canvas.style.width = v.width;
+			overlay.style.width = v.width;
+			var cxt = canvas.getContext("2d");
+			var img = new Image();
+			img.src = "320x40.png";
+			img.onload = function() {
+				cxt.drawImage(img, 0, 0);
+			};
+			v.onclick = function () {
+				v.pause();
+			}
+		}
+	};
+
+	function animate (domElem) {
+		if (domElem.className) {
+			domElem.className = "";
+		} else {
+			domElem.className = "animate";
+		}
+	}
+
+	function animTest () {
+		animate(overlay);
+		setTimeout(function () {
+			animate(overlay);
+		}, 2000);
+	}
+		
+	setTimeout(function (){				
+		animTest();
+	}, 3000); 
+	</script>
+	<link rel="stylesheet" type="text/css" href="prototype.css">
+</head>
+<body>
+
+	<div id="container">
+		<video muted width="320" id="v" autoplay="">
+			<source id="mp4" src="mov_bbb.mp4" type="video/mp4">
+		</video>	
+		<div id="pushIt"></div>
+		<div id="overlay" class="animate">
+			<canvas id="cvs"></canvas>
+		</div>
+	</div>	
+
+
+
+</body>
+</html>
