@@ -2,18 +2,14 @@
 
 ## notes
 
-Apply css must spinn through '-webkit', '-ms' and  to increase compability
-```
-div {
-  -webkit-transform: value;
-  -moz-transform:    value;
-  -ms-transform:     value;
-  -o-transform:      value;
-  transform:         value;
-}
-```
+## live demo
+http://codepen.io/asmodeus/pen/CaAjx
 
-Implement generated stylesheet loaded on start with custom transforms appending transforms on elements are a question of changing css classes on them. 
+
+run project with 'grunt'
+
+overlays configure via the jsonspec file
+
 
 TODO: 
 Controls...
