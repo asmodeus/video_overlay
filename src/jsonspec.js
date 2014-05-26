@@ -22,23 +22,23 @@ var jsonspec = {
 	     */
 		 type : String('animatable'),
 		 tag : String('div'),  /* default 'div' */
-		 dimensions: {x:Number(100), y:Number(100)}, /* specify minimum width and height of banner */
-		 opacity: Number( 0.5 ),
+		 dimensions: {x:Number(), y:Number()}, /* specify minimum width and height of banner */
+		 opacity: Number( 0.1 ),
 
-		 background : String(''), /* BG color */
+		 background : String('red'), /* BG color */
 		/**
 		 * Placement types: 'top', 'bottom', 'left', 'right'.
 		 * Specifying banner type and x or y dimension overrides x and y placement,
 		 * the x and y *dimension* can still be modified though depending on where the banner will appear.
 		 * @type {number}
 		 */
-		 placement: {x:Number(100), y:Number(0), type:String('')}, /* where on the video would you like to place the element */
+		 placement: {x:Number(0), y:Number(0), type:String('top')}, /* where on the video would you like to place the element */
 		/**
 		 * Animation types: 'fade', 'spin' and 'none'.
 		 */	
 		 animation: {appear:Number(3), disappear:Number(5), type:String('fade')},			 
-		 innerhtml: String('<p>htmlstring</p>'), //specify message in overlay
-		 contentURL: String('http://placehold.it/350x150'),
+		 innerhtml: String('<p>Im a caption, hello!</p>'), //specify message in overlay
+		 contentURL: String(),
 		 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
 	}, 
     /**
@@ -51,7 +51,7 @@ var jsonspec = {
 	     * @type {string}
 	     */
 		 type : String('animatable'),
-		 tag : String('span'),  /* @type {number} */
+		 tag : String('div'),  /* @type {number} */
 		 dimensions: {x:Number(100), y:Number(100)}, /* specify minimum width and height of banner */
 		 opacity: Number( 1 ),
 
@@ -66,7 +66,7 @@ var jsonspec = {
 		 * Animation types: 'fade', 'spin' and 'none'.
 		 */	
 		 animation: {appear:Number(0), disappear:Number(5), type:String('spin')},			 
-		 innerhtml: String('<p>htmlstring</p>'), //specify message in overlay
+		 innerhtml: String('<bold>I am a html string</bold>'), //specify message in overlay
 		 contentURL: String('http://placehold.it/350x150'),
 		 redirectURL: String('http://google.se') //string to redirect user if he clicks the overlay 
 	}, 

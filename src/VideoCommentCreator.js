@@ -159,7 +159,7 @@ var video_overlay = {
 				});
 
 				if (elemConf.innerhtml)
-					element.innerHTML = elemConf.innerhtml;
+					element.htmlElement.innerHTML = elemConf.innerhtml;
 				break; 
 
 			case "media":

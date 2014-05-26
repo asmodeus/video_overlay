@@ -84,7 +84,7 @@ module.exports = function(grunt) {
 			unit: {
 				configFile: 'karma.conf.js',
 				singleRun: true,
-				files: karmaFiles,
+				files: karmaFiles
 			},
 			report: {
 				reporters: ['progress', 'coverage'],
@@ -97,7 +97,7 @@ module.exports = function(grunt) {
 					type : 'html',
 					dir : 'reports/'
 				},
-				files: karmaFiles,
+				files: karmaFiles
 			}
 		},
 		exec: {
@@ -130,7 +130,7 @@ module.exports = function(grunt) {
 				}
 			},
 			files: ['spec/e2e/**/*.js']
-		},
+		}
 		
 	};
 
