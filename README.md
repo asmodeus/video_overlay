@@ -1,8 +1,7 @@
-# ws_video_overlay is used to create html overlays
+# this is used to create simple html overlays.
 
-## notes
 
-## live demo
+## live demo
 http://codepen.io/asmodeus/pen/CaAjx
 
 
