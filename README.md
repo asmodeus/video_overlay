@@ -1,4 +1,5 @@
-# this is used to create simple html overlays.
+# HTML5 Overlay
+## This project is used to create simple html overlays,  AKA divs with css3.
 
 
 ## live demo
