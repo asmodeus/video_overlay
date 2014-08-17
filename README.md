@@ -1,18 +1,12 @@
-# HTML5 Overlay
-## This project is used to create simple html overlays,  AKA divs with css3.
+## HTML5 Overlay
+### This project is used to create simple html overlays,  AKA divs with css3.
 
+This is a temporary project it will later be included in another project I'm working on.
 
-## live demo
+### live demo
 http://codepen.io/asmodeus/pen/CaAjx
 
+Run project with 'grunt' default task
 
-run project with 'grunt'
-
-overlays configure via the jsonspec file
-
-
-TODO: 
-Controls...
-Placing objects uses padding and not anything else
-
+Configure with the jsonspec file
 
